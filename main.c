@@ -3,9 +3,11 @@
 
 int main(int argc, char const *argv[])
 {
-	if(\n){
-		search_mypath();
-	}
+	char[MAX] input;
+	do{
 	
+
+		
+	}while(strcmp(input,"exit") != 0)
 	return 0;
 }
