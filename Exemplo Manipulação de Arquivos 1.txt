@@ -1,0 +1,49 @@
+/*biblioteca que contem as funcoes de Entrada e Saida */
+/*tipo FILE - utilizado para manipular um arquivo (texto ou binario)*/
+#include <stdio.h>
+#define MAX 100
+
+int main(void)
+{
+    char nome_base[MAX+1], nome_copia[MAX+1];
+    int c;
+    FILE *ptbase,        /*variaveis para manipular um arquivo de Ent e Saida*/
+         *ptcopia;
+
+    printf("Informe o nome do arquivo a ser copiado: ");
+    scanf("%s", nome_base);
+
+    printf("Informe o nome do arquivo resultante: ");
+    scanf("%s", nome_copia);
+
+    
+    /*funcao fopen abre o arquivo cujo nome esta em nome_base com o objetivo de leitura "r"*/
+    ptbase = fopen(nome_base, "r");
+
+    if (ptbase != NULL) {
+        
+        /*funcao fopen abre o arquivo cujo nome esta em nome_copia com o objetivo de escrita "w"*/
+        ptcopia = fopen(nome_copia, "w");
+
+        /*se o arquivo nao pode ser aberto a variavel 'ptcopia' fica com valor NULL*/
+        if (ptcopia != NULL) {
+            /*funcao fgetc - le um caracter a partir do arquivo ptbase e retorna seu codigo ASCII */
+            
+            c = fgetc(ptbase);
+            while (c != EOF) {    /*EOF - caracter de final de arquivo*/
+                
+                /*fputc - escreve o caracter c no arquivo ptcopia*/
+                fputc(c, ptcopia);
+                
+                c = fgetc(ptbase);
+            }
+            
+            fclose(ptbase); /*fclose - funcao utilizada para fechar um arquivo */
+            fclose(ptcopia);
+            printf("Arquivo copiado\n");
+        }
+        else printf("Impossivel abrir o arquivo %s para escrita\n", nome_copia);
+    }
+    else printf("Impossivel abrir o arquivo %s para leitura\n", nome_base);
+    return 0;
+}
