@@ -2,4 +2,4 @@
 Trabalho de Inroducao a Sistemas Operacionais
 
 
-COLOCAR FLAG gcc -l
+COLOCAR FLAG gcc -I
