@@ -1,0 +1,50 @@
+#include<stdio.h>
+#define MAX 50
+
+int buscaR(int esq, int dir, int v[MAX])
+{
+    if(esq == dir -1)
+        return -1;
+    else{
+        int meio;
+
+        meio = (esq+dir)/2;
+        if(v[meio] == meio)
+            return meio;
+        else if(meio > v[meio])
+            return buscaR(meio, dir, v);
+        else return buscaR(esq, meio, v);
+    }
+}
+
+
+
+
+int main()
+{
+    FILE* arquivo;  /*variavel para manipular o arquivo*/
+    int i,          /*indice*/
+        n,          /*tamanho do vetor*/
+        pos;        /*posicao do vetor tal que v[pos] = pos*/
+
+    int vetor[MAX];
+
+    /*abertura do arquivo*/
+    arquivo = fopen("vetor.txt", "r");
+    if(!arquivo)
+        printf("\n arquivo nao pode ser aberto");
+    else{
+        /*leitura do primeiro valor do arquivo (tam do vetor)*/
+        fscanf(arquivo, "%d", &n);
+        for(i = 0; i < n; i++) /*leitura dos n elementos do vetor(do arquivo)*/
+            fscanf(arquivo, "%d", &vetor[i]);
+
+        /* a funcao ira buscar uma posicao i tal que v[i] = i. Caso nao exista, retornara -1.
+        Para isso, utilizara a busca binaria que tem custo O(log n). Nao eh necessario enviar
+        valor a ser buscado, o valor eh a propria posicao do indice do vetor*/
+        pos = buscaR(0, n, vetor);
+
+        printf("\nPosicao: %d", pos);
+    }
+    return 0;
+}
