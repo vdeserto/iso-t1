@@ -1,9 +1,10 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 #include <sys/types.h>
 #include <unistd.h>
 
-//#include "commands.h"
+#include "commands.h"
 
 #define MAX_INPUT 512
 #define MAX_MYPS1 64
@@ -24,49 +25,35 @@ int main(int argc, char const *argv[])
 
 //BUSCA E TENTAR EXEC()
 
-
-
-
-int main(void)
+int main()
 {
-	char input[MAX_INPUT];
-	FILE *arquivo;
-
+	char *input;
+	char c;
+	mypath();
+	init_myps1();
 	do{
-		scanf("%s", input);
-
-		//Separar os argumentos
-		i=0;
-		j=0;
-		contador=0;
-		while(input[i] != '/n'){
-            if(input[i] != '/0'){
-                argumento[j] = input[i];
-                i++;
-                j++;
-            }
-            else{
-                contador++;
-                v[contador][0] = input[i];
-                v[contador][1] = input[i+1];
-                i=i+2;
-                j=0;
-            }
-		}
-        if(contador == 0)
-            create_process(input);
-        else if(contador == 1)
-            create_process(input, v[0]);
-        else if(contador == 2)
-            create_process(input, v[0], v[1]);
-        else if(contador == 3)
-            create_process(input, v[0], v[1], v[2]);
-        else if(contador == 4)
-            create_process(input, v[0], v[1], v[2], v[3]);
+		
+		input = (char*) malloc (MAX_INPUT* sizeof(char));
+		printf("%s", MYPS1);
+		scanf("%[^\n]s", input);
+		c = getchar();
+		if(strcmp(input, "exit") == 0)
+			exit(0);
+		printf("GETCHAR:%d\n", c);
+		
+		//if(input[0] == ' '){
+			create_process(input);
+			//printf("bbb: %s\n", input);
+		//}
+		//else{
+			//continue;
+		//}
+			free(input);
 
 	}while(1);
 
-	printf("%s", $PATH);
+
+	printf("%s", MYPATH);
 
 
 	return 0;
