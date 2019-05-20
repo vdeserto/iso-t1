@@ -7,6 +7,8 @@
 #include <string.h>
 #include <stdbool.h>
 #include <errno.h>
+#include <ctype.h>
+#include <math.h>
 #include "commands.h"
 
 
@@ -17,8 +19,6 @@ void manipInput(char *string){
 	bgCount = 0;
 	/*inCount = 0; Não implementado*/
 	outCount = 0;
-	cd = 0;
-	
 	errCount = 0;
 	
 	while(string[tam-1] == 32)/*Se houver 'space', o tamanho da string eh reduzida*/
@@ -33,20 +33,20 @@ void manipInput(char *string){
 			qntArgs--;
 		}
 		
-		if(strcmp(args[j],"cd") == 0){
-				cd++;
-				if(args[j+1] <= " " && (strcmp(args[j+1], ">") == 0 || strcmp(args[j+1], "<") == 0 ) )	{
-					cd++;
-				}
-				else{
-					chdir(args[j+1]);/*SYSTEM CALL DO CD = CHANGE DIRECTORY*/
-					return;
-				}
+		if(strcmp(args[0],"cd") == 0){
+			if(exists(args[1])){
+				chdir(args[1]);/*SYSTEM CALL DO CD = CHANGE DIRECTORY*/
+				return;
+			}
+			else{
+				fprintf(stderr, "%s\n", strerror(errno));
+				return;
+			}
 		}
-		if(strcmp(args[j], ">") == 0){
+		if(strcmp(args[0], ">") == 0){
+			outCount++;
+			if(args[1] <= " " || (strcmp(args[1], ">") == 0 || strcmp(args[1], "<") == 0 ) )
 				outCount++;
-				if(args[j+1] <= " " && (strcmp(args[j+1], ">") == 0 || strcmp(args[j+1], "<") == 0 ) )
-					outCount++;
 		}
 	}
 		
@@ -56,18 +56,23 @@ void manipInput(char *string){
 			
 			/*if(strcmp(args[j], "<") == 0){
 			 *	inCount++;
-			 *	if(args[j+1] <= " " && (strcmp(args[j+1], ">") == 0 || strcmp(args[j+1], "<") == 0 ) )
+			 *	if(args[j+1] <= " " || (strcmp(args[j+1], ">") == 0 || strcmp(args[j+1], "<") == 0 ) )
 			 *		inCount++;
 			 *	else
 			 *		inPos = j+1;
-			}*
+			 *}
 			 * Não implementado
 			 */
 		
-					
+			if(strcmp(args[j], "|") == 0 && args[j+1] > " "){
+				meuPipe();
+				return;
+			}			
+
+		
 			if(strcmp(args[j], "2>") == 0){
 				errCount++;
-				if(args[j+1] <= " " && (strcmp(args[j+1], ">") == 0 || strcmp(args[j+1], "<") == 0 ) )
+				if(args[j+1] <= " " || (strcmp(args[j+1], ">") == 0 || strcmp(args[j+1], "<") == 0 ) )
 					errCount++;
 				else
 					errPos = j+1;
@@ -76,7 +81,7 @@ void manipInput(char *string){
 			
 			if(strcmp(args[j], ">") == 0){
 				outCount++;
-				if(args[j+1] <= " " && (strcmp(args[j+1], ">") == 0 || strcmp(args[j+1], "<") == 0 ) )
+				if(args[j+1] <= " " || (strcmp(args[j+1], ">") == 0 || strcmp(args[j+1], "<") == 0 ) )
 					outCount++;
 				else
 					posOut = j+1;
@@ -86,6 +91,19 @@ void manipInput(char *string){
 				bgCount++;
 				reorganize(j);
 			}
+			if(strcmp(args[j],"cd") == 0){
+				if(exists(args[j+1]) == 1){
+					chdir(args[j+1]);/*SYSTEM CALL DO CD = CHANGE DIRECTORY*/
+					return;
+				}
+				else if (exists(args[j+1]) == 0){
+					if(errCount == 1){
+						fprintf(errp, "%s\n", strerror(errno));
+					}
+					else
+						fprintf(stderr, "%s\n", strerror(errno));	
+				}
+			}
 		}/*fim do for*/
 	}/*fim do if */
 	
@@ -94,7 +112,8 @@ void manipInput(char *string){
 
 	
 	caminho = splitPath(args[0]);/*separando caminhos*/
-	
+	if(caminho == NULL)
+		return;
 	
 	if((outCount == 0 && errCount == 0) /*&& inCount == 0*/){
 		create_process(caminho);
@@ -128,7 +147,7 @@ void manipInput(char *string){
  * não foi implementado os 50 últimos
  */
 void history(char* string){
-	int cod;
+	cod;
 	FILE* escrita;
 	char lixo;
 	
@@ -171,9 +190,33 @@ void history(char* string){
  */ 
 void printHistory(){
 	FILE *entrada;
-	
 	entrada = fopen("history.txt", "r");
-	
+/*	int start;
+	int i, aux;
+	char qtd[3];
+	if(cod > 50){
+		start = cod - 50;
+		i=0;
+		while(start > 9){
+			aux = start/10;
+			qtd[i] = (char)aux;
+			start%=10;	
+			i++;
+		}
+		qtd[i] = start;
+		if(!isdigit(qtd[1]))
+			qtd[1] = '\0';
+		if(!isdigit(qtd[2]))
+			qtd[2] = '\0';
+		if(!isdigit(qtd[3]))	
+			qtd[3] = '\0';
+		
+	}	
+	else{
+		start = 1;
+		qtd[0] = (char)start;
+	}*/
+
 	if(entrada == NULL)
 		fprintf(stderr, "%s\n", strerror(errno));
 	else{
@@ -184,11 +227,39 @@ void printHistory(){
 				fprintf(stdout,"%c", a);
 		}while(a != EOF);
 	}
+
 	fclose(entrada);
 	
-	
-	
+	return;
 }
+/*Tentativa: parte comentada*/
+	/*else{
+		char s;
+		char num[3];
+		s = fgetc(entrada);
+	 	while( s != EOF ){
+			s = fgetc(entrada);
+			if(isdigit(s)){
+			printf("VALOR DE S:%c e num:%d\n", s, num[0]); 
+ 				if(s = qtd[0])
+					num[0] = s;		
+				 if(s == qtd[1])
+					num[1] = s;
+				  if(s == qtd[2])
+				  	num[2] = s;
+				   if(strcmp(num,qtd) == 0){
+
+					while(s != EOF){
+						fprintf(stdout,"%c", s);
+						s = fgetc(entrada);
+					}
+				    }
+				
+			}
+
+		}
+	}/* fim do else */ 
+	
 
 
 
@@ -407,7 +478,56 @@ int exists(const char *path)
 }
 
 
+void meuPipe(){
+	
+	FILE *pipein_fp, *pipeout_fp;
+        char readbuf[80];
+	char in[32];
+	char out[32];
+	int i=1;
+	int j;
+	
+	strcpy(in, args[0]);
+	while(strcmp(args[i], "|") != 0){/*unindo os argumentos para execução*/
+		strcat(in, " ");
+		strcat(in, args[i]);
+		i++;
+	}
 
+	i++;
+	j=i;/*primeiro arg depois do pipe */
+	strcpy(out, args[i]);		
+
+	i++;
+	while(args[i] != NULL){/*unindo os argumentos para execução*/
+		strcat(out, " ");
+		strcat(out, args[i]);
+		i++;
+	}
+
+        if (( pipein_fp = popen(in, "r")) == NULL)
+        {
+                perror("popen");
+                fprintf(stderr, "%s\n", strerror(errno));
+        }
+       
+        if (( pipeout_fp = popen(out, "w")) == NULL)
+        {
+                perror("popen");
+		fprintf(stderr, "%s\n", strerror(errno));
+        }
+
+        /* Processando loop */
+        while(fgets(readbuf, 80, pipein_fp))
+                fputs(readbuf, pipeout_fp);
+
+        /* Fecha os pipes */
+        pclose(pipein_fp);
+        pclose(pipeout_fp);
+
+    return;
+
+}
 
 void mypath(){
 	char *name = "PATH";

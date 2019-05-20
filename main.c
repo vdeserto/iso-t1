@@ -32,21 +32,21 @@ int main()
 		for(i=0;i < characters;i++);
 		input[i-1] = 0;
 		qntArgs = 0;
-		history(input);
+
 		
 		if(strcmp(input, "history") == 0)
 			printHistory();	
 
-		if(strcmp(input,"exit") == 0)
+		else if(strcmp(input,"exit") == 0)
 			exit(0);
 		
-		else if(input[0] > 32){
-			manipInput(input);
+		else if(input[0] > 32){		
+			history(input);
+			if( strcmp(input,"history") != 0){
+				manipInput(input);
+				free(input);
+			}
 		}
-		if(input[0] >= 32){
-			free(input);
-		}
-
 		for(i=0;i<qntArgs;i++){
 			free(args[i]);
 		}

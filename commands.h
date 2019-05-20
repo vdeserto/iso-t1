@@ -38,3 +38,4 @@ void red_out();
 void manipInput(char* string);
 void history(char* string);
 void printHistory();
+void meuPipe();
