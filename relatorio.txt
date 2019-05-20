@@ -1,0 +1,57 @@
+Relatorio do trabalho de ISO:
+
+
+O objetivo era construir um interpretador de shell na linguagem C.
+
+
+
+Funcionalidades não implementadas:
+
+Precisavamos saber se no comando digitado encontrava-se '<', caso positivo, a entrada deveria
+ser lida de um arquivo.
+
+Implementação do comando export para (re)definição de variáveis de ambiente. Por
+exemplo, export MYPATH=$MYPATH:/NovoDiretorio.
+
+Implementação de um tratador de sinais para tratar o sinal SIGINT e evitar que o interpretador
+de comandos seja terminado quando as teclas Control+C forem pressionadas.
+
+ 
+
+Funcionalidades implementadas:
+
+A primeira coisa que fizemos foi montar a sintaxe com o prompt inicial igual a iso$ na
+variável de ambiente MYPS1.
+
+Depois da leitura da variável que chamamos de "input", que é a linha de comando que foi lida,
+tivemos que separar cada argumento.
+
+Também precisavamos saber o caminho que o comando digitado estava. Para isso usamos a função
+splitPath que pegava todos os paths possíveis e fazia uma concatenização com o comando
+digitado, retornando o único caminho existente para aquele comando.
+
+Tomando o caminho e os argumentos já separados, usamos então a chamada de sistema execv().
+
+Também precisavamos saber se no comando digitado encontrava-se '&', para saber se a chamada
+de sistema iria rodar em background ou foreground.
+
+Também precisavamos saber se no comando digitado encontrava-se '>', caso positivo, a saída
+deveria ser guardada em um arquivo.
+
+Também implementamos o histórico, para salvar em um arquivo chamado history.txt todos os
+comandos já feitos. E pode-se ser conferido na tela digitando o comando "history".
+
+implementamos também o comando "cd", change directory, através da chamada de sistema chdir().
+
+Implementação de pipe entre dois programas.
+
+Implementação do comando exit para encerrar o interpretador de comandos
+
+
+
+
+
+
+
+
+
